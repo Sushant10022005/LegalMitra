@@ -7,9 +7,45 @@ from dotenv import load_dotenv
 
 # Load API key from .env
 load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise ValueError("GEMINI_API_KEY not found in environment variables")
+
+# Configure the Gemini API with the API key
+genai.configure(api_key=api_key)
 
 TaskType = Literal["summary"]
+
+def get_gemini_response(prompt: str) -> str:
+    """
+    Get a response from the Gemini API.
+    
+    Args:
+        prompt: The prompt to send to the Gemini API
+        
+    Returns:
+        str: The response from the Gemini API
+    """
+    model = genai.GenerativeModel('gemini-2.0-flash')
+    
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 2000,
+                "temperature": 0.2
+            }
+        )
+        
+        # Handle the response correctly based on its structure
+        if hasattr(response, 'text'):
+            return response.text
+        elif hasattr(response, 'parts') and len(response.parts) > 0:
+            return response.parts[0].text
+        else:
+            return "Error: Unexpected response format from Gemini API"
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 def is_legal_document(text: str) -> bool:
     """
@@ -278,6 +314,8 @@ def combine_legal_analyses(chunk_results: List[Dict[str, Any]], task: TaskType) 
         model = genai.GenerativeModel('gemini-2.0-flash')
         response = model.generate_content(
             f"""
+            IMPORTANT: Base your analysis ONLY on the provided case details, relevant laws, and similar cases i.e. from IndianKanoon API only no making cases by yourself. Do not make assumptions or include information not provided in these sources. Provide proofs that these are real world cases.
+            
             Based on the following extracted information from an Indian legal document, 
             create a coherent and comprehensive legal analysis as a senior advocate would:
             

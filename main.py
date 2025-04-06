@@ -2,6 +2,7 @@ import os
 import streamlit as st
 from utils.pdf_processor import extract_text_from_pdf, chunk_text
 from utils.api_handler import analyze_legal_text, combine_legal_analyses, is_legal_document, find_similar_cases
+from utils.case_predictor.ui import render_case_predictor_ui
 from dotenv import load_dotenv
 
 # Config
@@ -13,7 +14,7 @@ st.title("⚖️ Indian Legal Analyzer (Gemini)")
 st.caption("Powered by Google Gemini API")
 
 # Create tabs for different features
-tab1, tab2 = st.tabs(["Document Analysis", "Case Research Chat"])
+tab1, tab2, tab3 = st.tabs(["Document Analysis", "Case Research Chat", "Case Outcome Predictor"])
 
 with tab1:
     # File Upload
@@ -113,6 +114,10 @@ with tab2:
                 
                 # Add assistant response to chat history
                 st.session_state.messages.append({"role": "assistant", "content": response})
+
+with tab3:
+    # Use the UI component from the case_predictor module
+    render_case_predictor_ui()
 
 # Footer
 st.divider()
