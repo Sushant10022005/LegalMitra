@@ -1,4 +1,4 @@
-# LegisAI: Indian Legal Document Analysis
+# LegalMitra: Indian Legal Document Analysis
 
 LegisAI is an AI-powered legal document analysis tool designed specifically for Indian legal documents. It uses Google's Gemini AI to analyze legal documents, extract key information, and provide insights.
 
